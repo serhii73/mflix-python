@@ -76,7 +76,16 @@ def get_movies_by_country(countries):
         # TODO: Projection
         # Find movies matching the "countries" list, but only return the title
         # and _id.
-        return list(db.movies.find())
+        rez_ready = []
+
+        for i in countries:
+
+            db_rez = db.movies.find( { "countries": i } , {"_id": 1, "title": 1})
+
+            for i in db_rez:
+                rez_ready.append(i)
+        
+        return rez_ready
 
     except Exception as e:
         return e
