@@ -55,38 +55,13 @@ def get_db():
 # Use LocalProxy to read the global db instance with just `db`
 db = LocalProxy(get_db)
 
-
 def get_movies_by_country(countries):
-    """
-    Finds and returns movies by country.
-    Returns a list of dictionaries, each dictionary contains a title and an _id.
-    """
     try:
-
-        """
-        Ticket: Projection
-
-        Write a query that matches movies with the countries in the "countries"
-        list, but only returns the title and _id of each movie.
-
-        Remember that in MongoDB, the $in operator can be used with a list to
-        match one or more values of a specific field.
-        """
-
-        # TODO: Projection
-        # Find movies matching the "countries" list, but only return the title
-        # and _id.
-        rez_ready = []
-
-        for i in countries:
-
-            db_rez = db.movies.find( { "countries": i } , {"_id": 1, "title": 1})
-
-            for i in db_rez:
-                rez_ready.append(i)
-        
-        return rez_ready
-
+        # here's an example of the find() query
+        return list(db.movies.find(
+            {"countries": {"$in": countries}},
+            {"title": 1}
+        ))
     except Exception as e:
         return e
 
@@ -172,15 +147,7 @@ def get_movies_faceted(filters, page, movies_per_page):
 
 
 def build_query_sort_project(filters):
-    """
-    Builds the `query` predicate, `sort` and `projection` attributes for a given
-    filters dictionary.
-    """
     query = {}
-    # The field "tomatoes.viewer.numReviews" only exists in the movies we want
-    # to display on the front page of MFlix, because they are famous or
-    # aesthetically pleasing. When we sort on it, the movies containing this
-    # field will be displayed at the top of the page.
     sort = [("tomatoes.viewer.numReviews", DESCENDING)]
     project = None
     if filters:
@@ -192,18 +159,8 @@ def build_query_sort_project(filters):
         elif "cast" in filters:
             query = {"cast": {"$in": filters["cast"]}}
         elif "genres" in filters:
-
-            """
-            Ticket: Text and Subfield Search
-
-            Given a genre in the "filters" object, construct a query that
-            searches MongoDB for movies with that genre.
-            """
-
-            # TODO: Text and Subfield Search
-            # Construct a query that will search for the chosen genre.
+            # here's an implementation of the "genres" query
             query = {"genres": {"$in": filters["genres"]}}
-
     return query, sort, project
 
 
